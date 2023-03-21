@@ -1,10 +1,24 @@
 // pages/_app.js
-import { ChakraProvider } from "@chakra-ui/react";
+import { ChakraProvider, useColorMode } from "@chakra-ui/react";
+import { useEffect } from "react";
+
+function ForceDarkMode({ children }) {
+  const { colorMode, toggleColorMode } = useColorMode();
+
+  useEffect(() => {
+    if (colorMode === "dark") return;
+    toggleColorMode();
+  }, [colorMode]);
+
+  return children;
+}
 
 function MyApp({ Component, pageProps }) {
   return (
     <ChakraProvider>
-      <Component {...pageProps} />
+      <ForceDarkMode>
+        <Component {...pageProps} />
+      </ForceDarkMode>
     </ChakraProvider>
   );
 }
