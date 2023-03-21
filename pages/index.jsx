@@ -9,31 +9,33 @@ import {
   Spacer,
   Button,
   SimpleGrid,
+  useToast,
   Spinner,
+  IconButton,
 } from "@chakra-ui/react";
 import Head from "next/head";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
+import { FiLink2 } from "react-icons/fi";
 
 export default function Home({ success }) {
   const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [totalNumPosts, setTotalNumPosts] = useState(0);
   const [postLoading, setPostLoading] = useState(false);
   const [title, setTitle] = useState("untitled post");
   const [content, setContent] = useState("content goes here");
-  const [refresh, setRefresh] = useState(false);
   const router = useRouter();
+  const toast = useToast();
 
   useEffect(() => {
     console.log("mounted");
-    setLoading(true);
 
     fetch("/api/get-posts")
       .then((res) => res.json())
       .then((data) => {
         setPosts(data.posts || []);
-        setLoading(false);
+        setTotalNumPosts(data.totalNumPosts);
       });
   }, [router]);
 
@@ -51,6 +53,15 @@ export default function Home({ success }) {
 
     const res = await fetch("/api/create-post", options);
     const data = await res.json();
+
+    toast({
+      title: "Post Created.",
+      description: "We've created your anonymous post (scroll down to see).",
+      status: "success",
+      duration: 9000,
+      isClosable: true,
+    });
+
     router.replace(router.asPath);
     setPostLoading(false);
   };
@@ -58,13 +69,16 @@ export default function Home({ success }) {
   return (
     <>
       <Head>
-        <title>The Internet's journal</title>
+        <title>the internet&apos;s journal</title>
       </Head>
 
       <Container maxW="container.lg" mt={4}>
         <Heading fontWeight="black" fontSize="6xl" textAlign="center">
-          the internet&apos;s Journal
+          the internet&apos;s journal
         </Heading>
+        <Text textAlign="center" color="gray.400" fontSize="lg" mt={2}>
+          all posts are completely anonymous
+        </Text>
 
         <Box maxW="600px" mx="auto" mt={16} p={4} bg="gray.700" rounded="md">
           <Input
@@ -91,7 +105,10 @@ export default function Home({ success }) {
           </Flex>
         </Box>
 
-        <Box mt={16}>
+        <Text mt={16} color="gray.400" fontSize="lg">
+          {totalNumPosts} posts total
+        </Text>
+        <Box>
           <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10}>
             {posts.length > 0 &&
               posts.map((post) => (
@@ -107,11 +124,44 @@ export default function Home({ success }) {
                     </Text>
                   </Flex>
                   <Text mt={4}>{post.content}</Text>
+
+                  <Flex mt={4}>
+                    <Box />
+                    <Spacer />
+                    <IconButton
+                      p={0}
+                      bg=""
+                      m={0}
+                      icon={<FiLink2 />}
+                      onClick={async () => {
+                        navigator.clipboard.writeText(
+                          `localhost:3000/${post.slug}`
+                        );
+                        toast({
+                          title: "Link copied.",
+                          description: "The link to this post has been copied.",
+                          status: "success",
+                          duration: 9000,
+                          isClosable: true,
+                        });
+
+                        await fetch(`/api/increment-share/`, {
+                          method: "POST",
+                          body: JSON.stringify({
+                            slug: post.slug,
+                            currShare: post.shares,
+                          }),
+                        });
+                      }}
+                    ></IconButton>
+                  </Flex>
                 </Box>
               ))}
           </SimpleGrid>
         </Box>
       </Container>
+
+      <Box mt={16} />
     </>
   );
 }
