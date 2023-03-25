@@ -19,6 +19,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { FiLink2 } from "react-icons/fi";
 import { BsFlag } from "react-icons/bs";
+import { SlLike } from "react-icons/sl";
 
 export default function Home({ success }) {
   const [posts, setPosts] = useState([]);
@@ -145,15 +146,40 @@ export default function Home({ success }) {
                   <Text mt={4}>{post.content}</Text>
 
                   <Flex mt={4}>
-                    <Box />
+                    <Button
+                      p={0}
+                      bg=""
+                      m={0}
+                      rightIcon={<SlLike />}
+                      color="green.300"
+                      onClick={async () => {
+                        await fetch(`/api/increment-likes/`, {
+                          method: "POST",
+                          body: JSON.stringify({
+                            slug: post.slug,
+                            currLikes: post.likes,
+                          }),
+                        });
+
+                        toast({
+                          title: "Post Liked.",
+                          status: "success",
+                          duration: 3000,
+                          isClosable: true,
+                        });
+                      }}
+                    >
+                      {post.likes}
+                    </Button>
                     <Spacer />
                     <Box>
-                      <IconButton
+                      <Button
                         p={0}
                         bg=""
+                        leftIcon={<FiLink2 />}
                         m={0}
                         color="blue.300"
-                        icon={<FiLink2 />}
+                        // icon={<FiLink2 />}
                         onClick={async () => {
                           navigator.clipboard.writeText(
                             `localhost:3000/${post.slug}`
@@ -175,7 +201,9 @@ export default function Home({ success }) {
                             }),
                           });
                         }}
-                      />
+                      >
+                        {post.shares}
+                      </Button>
                       <IconButton
                         p={0}
                         bg=""
