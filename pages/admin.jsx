@@ -16,10 +16,13 @@ import {
 import Head from "next/head";
 import { useState } from "react";
 import { useEffect } from "react";
-import { useRouter } from "next/router";
 
-export default function Admin() {
+export default function Admin({ allow }) {
   const [posts, setPosts] = useState([]);
+
+  if (!allow) {
+    return <p>Access Denied</p>;
+  }
 
   useEffect(() => {
     fetch("/api/get-posts", {
@@ -87,4 +90,14 @@ export default function Admin() {
       </SimpleGrid>
     </Container>
   );
+}
+
+export async function getServerSideProps(context) {
+  const { password } = context.query;
+
+  if (password !== process.env.ADMIN_PASSWORD) {
+    return { props: { allow: false } };
+  }
+
+  return { props: { allow: true } };
 }
