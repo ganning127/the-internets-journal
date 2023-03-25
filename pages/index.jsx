@@ -126,7 +126,7 @@ export default function Home({ success }) {
         </Box>
 
         <Text mt={16} color="gray.400" fontSize="lg">
-          {totalNumPosts} posts total (most recent first)
+          {totalNumPosts} posts total ({posts.length} shown)
         </Text>
         <Box>
           <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10}>
