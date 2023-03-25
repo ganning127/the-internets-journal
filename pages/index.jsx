@@ -22,6 +22,7 @@ import { BsFlag } from "react-icons/bs";
 
 export default function Home({ success }) {
   const [posts, setPosts] = useState([]);
+  const [numRendered, setNumRendered] = useState(100);
   const [totalNumPosts, setTotalNumPosts] = useState(0);
   const [postLoading, setPostLoading] = useState(false);
   const [title, setTitle] = useState("untitled post");
@@ -30,23 +31,32 @@ export default function Home({ success }) {
   const toast = useToast();
 
   useEffect(() => {
-    console.log("mounted");
+    async function fetchData() {
+      const resp1 = await fetch("/api/get-total-posts");
+      const data1 = await resp1.json();
+      const totalPosts = data1.totalNumPosts;
 
-    fetch("/api/get-posts", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        query: JSON.stringify({
-          reported: false,
-        }),
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setPosts(data.posts || []);
-        setTotalNumPosts(data.totalNumPosts);
+      setTotalNumPosts(totalPosts);
+
+      const resp2 = await fetch("/api/get-posts", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          query: JSON.stringify({
+            reported: false,
+            doc_num: {
+              $gte: totalPosts - numRendered,
+              $lte: totalPosts,
+            },
+          }),
+        },
       });
-  }, [router]);
+
+      const data2 = await resp2.json();
+      setPosts(data2.posts || []);
+    }
+    fetchData();
+  }, [router, numRendered]);
 
   console.log(posts);
 
@@ -65,7 +75,7 @@ export default function Home({ success }) {
 
     toast({
       title: "Post Created.",
-      description: "We've created your anonymous post (scroll down to see).",
+      description: "We've created your anonymous post.",
       status: "success",
       duration: 9000,
       isClosable: true,
@@ -115,7 +125,7 @@ export default function Home({ success }) {
         </Box>
 
         <Text mt={16} color="gray.400" fontSize="lg">
-          {totalNumPosts} posts total
+          {totalNumPosts} posts total (most recent first)
         </Text>
         <Box>
           <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10}>
@@ -201,6 +211,19 @@ export default function Home({ success }) {
                 </Box>
               ))}
           </SimpleGrid>
+
+          {posts.length > 0 && numRendered <= totalNumPosts && (
+            <Flex mt={4}>
+              <Spacer />
+              <Button
+                colorScheme="blue"
+                size="sm"
+                onClick={() => setNumRendered(numRendered + 100)}
+              >
+                Load More
+              </Button>
+            </Flex>
+          )}
         </Box>
       </Container>
 

@@ -3,9 +3,8 @@ import slug from "slug";
 export default async function handler(req, res) {
   const client = await clientPromise;
   const db = client.db("posts");
-
   let created_at = new Date();
-
+  let totalNumPosts = await db.collection("posts").countDocuments();
   const madeSlug = slug(req.body.title, {
     lower: true,
     remove: /[*+~.()'"!:@]/g,
@@ -21,6 +20,8 @@ export default async function handler(req, res) {
     shares: 0,
     likes: 0,
     slug: useSlug,
+    doc_num: totalNumPosts,
+    reported: false,
   };
 
   const result = await db.collection("posts").insertOne(data);

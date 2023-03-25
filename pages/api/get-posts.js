@@ -10,6 +10,9 @@ export default async function handler(req, res) {
     .toArray();
   posts = JSON.parse(JSON.stringify(posts));
 
+  posts.sort((a, b) => b.doc_num - a.doc_num);
+
+  console.log(posts.length);
   if (posts.length > 0) {
     res
       .status(200)

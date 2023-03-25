@@ -6,7 +6,7 @@ export default async function handler(req, res) {
   const db = client.db("posts");
   let toUpdate = [];
 
-  for (let i = 3; i < 200; i++) {
+  for (let i = 0; i < 554; i++) {
     let created_at = new Date();
 
     const madeSlug = slug(`Post Title ${i}`, {
@@ -24,6 +24,8 @@ export default async function handler(req, res) {
       shares: randomIntFromInterval(1, 100),
       likes: randomIntFromInterval(1, 500),
       slug: useSlug,
+      reported: false,
+      doc_num: i,
     };
 
     toUpdate.push(data);
