@@ -4,7 +4,10 @@ export default async function handler(req, res) {
   const client = await clientPromise;
   const db = client.db("posts");
   let totalNumPosts = await db.collection("posts").countDocuments();
-  let posts = await db.collection("posts").find({}).toArray();
+  let posts = await db
+    .collection("posts")
+    .find(JSON.parse(req.headers.query))
+    .toArray();
   posts = JSON.parse(JSON.stringify(posts));
 
   if (posts.length > 0) {
@@ -24,7 +27,10 @@ export default async function handler(req, res) {
         .collection("posts")
         .updateOne({ slug: post.slug }, { $set: { views: newViews } });
     }
+
+    return;
   } else {
     res.status(500).json({ success: false });
+    return;
   }
 }

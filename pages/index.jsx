@@ -18,6 +18,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { FiLink2 } from "react-icons/fi";
+import { BsFlag } from "react-icons/bs";
 
 export default function Home({ success }) {
   const [posts, setPosts] = useState([]);
@@ -31,7 +32,15 @@ export default function Home({ success }) {
   useEffect(() => {
     console.log("mounted");
 
-    fetch("/api/get-posts")
+    fetch("/api/get-posts", {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        query: JSON.stringify({
+          reported: false,
+        }),
+      },
+    })
       .then((res) => res.json())
       .then((data) => {
         setPosts(data.posts || []);
@@ -128,32 +137,66 @@ export default function Home({ success }) {
                   <Flex mt={4}>
                     <Box />
                     <Spacer />
-                    <IconButton
-                      p={0}
-                      bg=""
-                      m={0}
-                      icon={<FiLink2 />}
-                      onClick={async () => {
-                        navigator.clipboard.writeText(
-                          `localhost:3000/${post.slug}`
-                        );
-                        toast({
-                          title: "Link copied.",
-                          description: "The link to this post has been copied.",
-                          status: "success",
-                          duration: 9000,
-                          isClosable: true,
-                        });
+                    <Box>
+                      <IconButton
+                        p={0}
+                        bg=""
+                        m={0}
+                        color="blue.300"
+                        icon={<FiLink2 />}
+                        onClick={async () => {
+                          navigator.clipboard.writeText(
+                            `localhost:3000/${post.slug}`
+                          );
+                          toast({
+                            title: "Link copied.",
+                            description:
+                              "The link to this post has been copied.",
+                            status: "success",
+                            duration: 9000,
+                            isClosable: true,
+                          });
 
-                        await fetch(`/api/increment-share/`, {
-                          method: "POST",
-                          body: JSON.stringify({
-                            slug: post.slug,
-                            currShare: post.shares,
-                          }),
-                        });
-                      }}
-                    ></IconButton>
+                          await fetch(`/api/increment-share/`, {
+                            method: "POST",
+                            body: JSON.stringify({
+                              slug: post.slug,
+                              currShare: post.shares,
+                            }),
+                          });
+                        }}
+                      />
+                      <IconButton
+                        p={0}
+                        bg=""
+                        m={0}
+                        icon={<BsFlag />}
+                        color="red.300"
+                        onClick={async () => {
+                          const res = await fetch(`/api/update-reported/`, {
+                            method: "POST",
+                            body: JSON.stringify({
+                              slug: post.slug,
+                              reported: true,
+                            }),
+                          });
+
+                          const data = await res.json();
+                          if (data.success) {
+                            setPosts(posts.filter((p) => p.slug !== post.slug));
+                          }
+
+                          toast({
+                            title: "Post Reported.",
+                            description: `"${post.title}" has been reported for review}.`,
+                            status: "warning",
+                            duration: 9000,
+                            // status='error'
+                            isClosable: true,
+                          });
+                        }}
+                      />
+                    </Box>
                   </Flex>
                 </Box>
               ))}
