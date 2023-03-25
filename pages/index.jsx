@@ -182,7 +182,7 @@ export default function Home({ success }) {
                         // icon={<FiLink2 />}
                         onClick={async () => {
                           navigator.clipboard.writeText(
-                            `localhost:3000/${post.slug}`
+                            `https://tij-ecru.vercel.app/${post.slug}`
                           );
                           toast({
                             title: "Link copied.",
