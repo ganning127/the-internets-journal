@@ -17,12 +17,11 @@ import Head from "next/head";
 import { useState } from "react";
 import { useEffect } from "react";
 import { useRouter } from "next/router";
-import { FiLink2 } from "react-icons/fi";
-import { BsFlag } from "react-icons/bs";
-import { SlLike } from "react-icons/sl";
+import { BsPencilSquare } from "react-icons/bs";
 import { PostCard } from "../components/PostCard";
 
 export default function Home() {
+  const [writeMode, setWriteMode] = useState("none");
   const [posts, setPosts] = useState([]);
   const [numRendered, setNumRendered] = useState(100);
   const [totalNumPosts, setTotalNumPosts] = useState(0);
@@ -91,7 +90,7 @@ export default function Home() {
         <title>the internet&apos;s journal</title>
       </Head>
 
-      <Container maxW="container.lg" mt={4}>
+      <Container maxW="container.xl" mt={4}>
         <Heading fontWeight="black" fontSize="6xl" textAlign="center">
           the internet&apos;s journal
         </Heading>
@@ -99,7 +98,36 @@ export default function Home() {
           all posts are completely anonymous
         </Text>
 
-        <Box maxW="600px" mx="auto" mt={16} p={4} bg="gray.700" rounded="md">
+        <Box textAlign="center">
+          <Button
+            mt={16}
+            leftIcon={writeMode == "none" ? <BsPencilSquare /> : null}
+            colorScheme="blue"
+            variant="solid"
+            width={{
+              base: "100%",
+              md: "auto",
+            }}
+            mx="auto"
+            px={8}
+            onClick={(e) => {
+              if (writeMode == "none") setWriteMode("block");
+              else setWriteMode("none");
+            }}
+          >
+            {writeMode == "none" ? "write a post" : "cancel"}
+          </Button>
+        </Box>
+
+        <Box
+          maxW="600px"
+          mx="auto"
+          mt={16}
+          p={4}
+          bg="gray.700"
+          rounded="md"
+          display={writeMode}
+        >
           <Input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
