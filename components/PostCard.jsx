@@ -20,6 +20,7 @@ import { BsFlag } from "react-icons/bs";
 import { SlLike } from "react-icons/sl";
 
 export const PostCard = ({ post }) => {
+  const [visible, setVisible] = useState("block");
   const toast = useToast();
   const [lines, setLines] = useState(
     post.content.split(" ").length > 30 ? 4 : ""
@@ -29,7 +30,14 @@ export const PostCard = ({ post }) => {
   const [shares, setShares] = useState(post.shares);
 
   return (
-    <Box key={post._id} mt={4} bg="gray.700" p={4} rounded="md">
+    <Box
+      key={post._id}
+      mt={4}
+      bg="gray.700"
+      p={4}
+      rounded="md"
+      display={visible}
+    >
       <Flex>
         <Heading fontWeight="black" fontSize="2xl">
           {post.title}
@@ -136,12 +144,13 @@ export const PostCard = ({ post }) => {
 
               const data = await res.json();
               if (data.success) {
-                setPosts(posts.filter((p) => p.slug !== post.slug));
+                setVisible("none");
+                console.log("setting to none");
               }
 
               toast({
                 title: "Post Reported.",
-                description: `"${post.title}" has been reported for review}.`,
+                description: `"${post.title}" has been reported for review.`,
                 status: "warning",
                 duration: 9000,
                 // status='error'

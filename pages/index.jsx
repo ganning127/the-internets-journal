@@ -22,7 +22,7 @@ import { BsFlag } from "react-icons/bs";
 import { SlLike } from "react-icons/sl";
 import { PostCard } from "../components/PostCard";
 
-export default function Home({ success }) {
+export default function Home() {
   const [posts, setPosts] = useState([]);
   const [numRendered, setNumRendered] = useState(100);
   const [totalNumPosts, setTotalNumPosts] = useState(0);
@@ -48,7 +48,7 @@ export default function Home({ success }) {
             reported: false,
             doc_num: {
               $gte: totalPosts - numRendered,
-              $lte: totalPosts,
+              $lte: totalPosts + 1,
             },
           }),
         },

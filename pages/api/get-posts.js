@@ -12,7 +12,6 @@ export default async function handler(req, res) {
 
   posts.sort((a, b) => b.score - a.score);
 
-  console.log(posts.length);
   if (posts.length > 0) {
     res
       .status(200)

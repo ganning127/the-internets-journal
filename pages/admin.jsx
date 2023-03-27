@@ -57,30 +57,58 @@ export default function Admin({ allow }) {
                     shares
                   </Text>
                 </Box>
-                <Button
-                  colorScheme="red"
-                  mt={4}
-                  onClick={async () => {
-                    const options = {
-                      method: "POST",
-                      headers: {
-                        "Content-Type": "application/json",
-                      },
-                      body: JSON.stringify({
-                        slug: post.slug,
-                        reported: false,
-                      }),
-                    };
+                <Box>
+                  <Button
+                    // colorScheme="green"
+                    bg=""
+                    color="green.300"
+                    mt={4}
+                    onClick={async () => {
+                      const options = {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                          slug: post.slug,
+                          reported: false,
+                        }),
+                      };
 
-                    const res = await fetch("/api/update-reported", options);
-                    const data = await res.json();
-                    if (data.success) {
-                      setPosts(posts.filter((p) => p.slug !== post.slug));
-                    }
-                  }}
-                >
-                  Safe
-                </Button>
+                      const res = await fetch("/api/update-reported", options);
+                      const data = await res.json();
+                      if (data.success) {
+                        setPosts(posts.filter((p) => p.slug !== post.slug));
+                      }
+                    }}
+                  >
+                    Safe
+                  </Button>
+                  <Button
+                    bg=""
+                    color="red.300"
+                    mt={4}
+                    onClick={async () => {
+                      const options = {
+                        method: "POST",
+                        headers: {
+                          "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                          slug: post.slug,
+                        }),
+                      };
+
+                      const res = await fetch("/api/delete-post", options);
+                      const data = await res.json();
+                      if (data.success) {
+                        setPosts(posts.filter((p) => p.slug !== post.slug));
+                      }
+                    }}
+                  >
+                    Dangerous
+                  </Button>
+                </Box>
               </Flex>
 
               <Text mt={4}>{post.content}</Text>
