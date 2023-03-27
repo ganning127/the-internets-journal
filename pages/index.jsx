@@ -91,7 +91,7 @@ export default function Home() {
       </Head>
 
       <Container maxW="container.xl" mt={4}>
-        <Heading fontWeight="black" fontSize="6xl" textAlign="center">
+        <Heading fontWeight="black" fontSize="6xl" textAlign="center" mt={16}>
           the internet&apos;s journal
         </Heading>
         <Text textAlign="center" color="gray.400" fontSize="lg" mt={2}>
@@ -100,7 +100,7 @@ export default function Home() {
 
         <Box textAlign="center">
           <Button
-            mt={16}
+            mt={4}
             leftIcon={writeMode == "none" ? <BsPencilSquare /> : null}
             colorScheme="blue"
             variant="solid"
