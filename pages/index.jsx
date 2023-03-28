@@ -27,10 +27,12 @@ export default function Home() {
   const [numRendered, setNumRendered] = useState(100);
   const [totalNumPosts, setTotalNumPosts] = useState(0);
   const [sortMode, setSortMode] = useState("best");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     async function fetchData() {
+      setLoading(true);
       const resp1 = await fetch("/api/get-total-posts");
       const data1 = await resp1.json();
       const totalPosts = data1.totalNumPosts;
@@ -54,6 +56,7 @@ export default function Home() {
 
       const data2 = await resp2.json();
       setPosts(data2.posts || []);
+      setLoading(false);
     }
     fetchData();
   }, [router, numRendered, sortMode]);
@@ -120,6 +123,11 @@ export default function Home() {
         <Text mt={16} color="#774936" fontSize="lg"></Text>
         <Box>
           <Button
+            bg="#edc4b3"
+            color="#774936"
+            _hover={{
+              bg: "#d69f7e",
+            }}
             onClick={() => {
               if (sortMode == "newest") {
                 setSortMode("best");
@@ -130,12 +138,18 @@ export default function Home() {
           >
             Sort by: {sortMode}
           </Button>
-          <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10}>
-            {posts.length > 0 &&
-              posts.map((post) => {
-                return <PostCard key={post._id} post={post} />;
-              })}
-          </SimpleGrid>
+          {!loading ? (
+            <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10}>
+              {posts.length > 0 &&
+                posts.map((post) => {
+                  return <PostCard key={post._id} post={post} />;
+                })}
+            </SimpleGrid>
+          ) : (
+            <Box mt={4}>
+              <Spinner />
+            </Box>
+          )}
 
           {posts.length > 0 && numRendered <= totalNumPosts && (
             <Flex mt={4}>
