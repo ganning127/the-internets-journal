@@ -44,7 +44,7 @@ export default function Home({ success, post }) {
         <Divider mt={16} />
         <Text mt={4} textAlign="center">
           head back to the{" "}
-          <Link href="/" color="blue.300">
+          <Link href="/" color="#9d6b53">
             home page
           </Link>
         </Text>
