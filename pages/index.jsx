@@ -19,17 +19,15 @@ import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { BsPencilSquare } from "react-icons/bs";
 import { PostCard } from "../components/PostCard";
+import { TextEditor } from "../components/TextEditor";
 
 export default function Home() {
   const [writeMode, setWriteMode] = useState("none");
   const [posts, setPosts] = useState([]);
   const [numRendered, setNumRendered] = useState(100);
   const [totalNumPosts, setTotalNumPosts] = useState(0);
-  const [postLoading, setPostLoading] = useState(false);
-  const [title, setTitle] = useState("untitled post");
-  const [content, setContent] = useState("content goes here");
+  const [sortMode, setSortMode] = useState("best");
   const router = useRouter();
-  const toast = useToast();
 
   useEffect(() => {
     async function fetchData() {
@@ -43,6 +41,7 @@ export default function Home() {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
+          sorttype: sortMode,
           query: JSON.stringify({
             reported: false,
             doc_num: {
@@ -57,32 +56,7 @@ export default function Home() {
       setPosts(data2.posts || []);
     }
     fetchData();
-  }, [router, numRendered]);
-
-  const handlePost = async () => {
-    setPostLoading(true);
-    const options = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ title, content }),
-    };
-
-    const res = await fetch("/api/create-post", options);
-    const data = await res.json();
-
-    toast({
-      title: "Post Created.",
-      description: "We've created your anonymous post.",
-      status: "success",
-      duration: 9000,
-      isClosable: true,
-    });
-
-    router.replace(router.asPath);
-    setPostLoading(false);
-  };
+  }, [router, numRendered, sortMode]);
 
   return (
     <>
@@ -91,18 +65,31 @@ export default function Home() {
       </Head>
 
       <Container maxW="container.xl" mt={4}>
-        <Heading fontWeight="black" fontSize="6xl" textAlign="center" mt={16}>
+        <Heading
+          fontWeight="black"
+          fontSize="7xl"
+          textAlign="center"
+          mt={16}
+          color="#774936"
+        >
           the internet&apos;s journal
         </Heading>
-        <Text textAlign="center" color="gray.400" fontSize="lg" mt={2}>
-          all posts are completely anonymous
+        <Text textAlign="center" color="#8a5a44" fontSize="lg" mt={2}>
+          all posts are completely anonymous •{" "}
+          <Text as="span" fontWeight="bold">
+            {totalNumPosts} posts total
+          </Text>
         </Text>
 
         <Box textAlign="center">
           <Button
             mt={4}
             leftIcon={writeMode == "none" ? <BsPencilSquare /> : null}
-            colorScheme="blue"
+            color="white"
+            bg="#9A8C98"
+            _hover={{
+              bg: "#8a5a44",
+            }}
             variant="solid"
             width={{
               base: "100%",
@@ -119,43 +106,30 @@ export default function Home() {
           </Button>
         </Box>
 
-        <Box
+        <TextEditor
           maxW="600px"
           mx="auto"
           mt={16}
           p={4}
-          bg="gray.700"
+          bg="#ebd6ca"
           rounded="md"
           display={writeMode}
-        >
-          <Input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            fontWeight="bold"
-            size="lg"
-          />
-          <Textarea
-            value={content}
-            placeholder="start typing here..."
-            onChange={(e) => setContent(e.target.value)}
-            rows={12}
-            mt={4}
-          />
+          sortHandler={setSortMode}
+        ></TextEditor>
 
-          <Flex mt={4}>
-            <Text color="gray.400">{content.length} characters</Text>
-            <Spacer />
-
-            <Button colorScheme="blue" size="sm" onClick={handlePost}>
-              {postLoading ? <Spinner size="sm" /> : "Post"}
-            </Button>
-          </Flex>
-        </Box>
-
-        <Text mt={16} color="gray.400" fontSize="lg">
-          {totalNumPosts} posts total ({posts.length} shown)
-        </Text>
+        <Text mt={16} color="#774936" fontSize="lg"></Text>
         <Box>
+          <Button
+            onClick={() => {
+              if (sortMode == "newest") {
+                setSortMode("best");
+              } else {
+                setSortMode("newest");
+              }
+            }}
+          >
+            Sort by: {sortMode}
+          </Button>
           <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10}>
             {posts.length > 0 &&
               posts.map((post) => {
@@ -167,7 +141,11 @@ export default function Home() {
             <Flex mt={4}>
               <Spacer />
               <Button
-                colorScheme="blue"
+                bg="#774936"
+                color="white"
+                _hover={{
+                  bg: "#8a5a44",
+                }}
                 size="sm"
                 onClick={() => setNumRendered(numRendered + 100)}
               >

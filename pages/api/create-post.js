@@ -22,6 +22,7 @@ export default async function handler(req, res) {
     slug: useSlug,
     doc_num: totalNumPosts,
     reported: false,
+    score: 0,
   };
 
   const result = await db.collection("posts").insertOne(data);

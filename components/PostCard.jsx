@@ -33,22 +33,23 @@ export const PostCard = ({ post }) => {
     <Box
       key={post._id}
       mt={4}
-      bg="gray.700"
+      bg="#ebd6ca"
       p={4}
       rounded="md"
       display={visible}
+      shadow="md"
     >
       <Flex>
-        <Heading fontWeight="black" fontSize="2xl">
+        <Heading fontWeight="black" fontSize="2xl" color="#774936">
           {post.title}
         </Heading>
         <Spacer />
-        <Text color="gray.400" fontSize="sm">
+        <Text color="#8a5a44" fontSize="sm">
           {post.views} views • {new Date(post.created_at).toLocaleDateString()}
         </Text>
       </Flex>
 
-      <Text mt={4} noOfLines={lines}>
+      <Text mt={4} noOfLines={lines} color="#22223B">
         {post.content}
       </Text>
 
@@ -72,7 +73,7 @@ export const PostCard = ({ post }) => {
           bg=""
           m={0}
           rightIcon={<SlLike />}
-          color="green.300"
+          color="#8a5a44"
           onClick={async () => {
             setLikes(++post.likes);
             await fetch(`/api/increment-likes/`, {
@@ -100,7 +101,7 @@ export const PostCard = ({ post }) => {
             bg=""
             leftIcon={<FiLink2 />}
             m={0}
-            color="blue.300"
+            color="blue.600"
             // icon={<FiLink2 />}
             onClick={async () => {
               navigator.clipboard.writeText(
@@ -132,7 +133,7 @@ export const PostCard = ({ post }) => {
             bg=""
             m={0}
             icon={<BsFlag />}
-            color="red.300"
+            color="red.700"
             onClick={async () => {
               const res = await fetch(`/api/update-reported/`, {
                 method: "POST",

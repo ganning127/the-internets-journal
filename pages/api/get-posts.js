@@ -10,7 +10,14 @@ export default async function handler(req, res) {
     .toArray();
   posts = JSON.parse(JSON.stringify(posts));
 
-  posts.sort((a, b) => b.score - a.score);
+  let sortType = req.headers.sorttype;
+  // sort posts by created datae
+
+  if (sortType === "best") {
+    posts.sort((a, b) => b.score - a.score);
+  } else if (sortType === "newest") {
+    posts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  }
 
   if (posts.length > 0) {
     res
